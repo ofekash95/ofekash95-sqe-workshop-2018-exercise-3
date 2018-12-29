@@ -9,32 +9,12 @@ $(document).ready(function () {
         let parsedCode = parseCode(codeToParse);
         runManage(parsedCode);
         console.log(JSON.stringify(cfg));
-        // setCfg();
         let code = generateChartLang();
         console.log(code);
         makeFlowDiagram(code);
         $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
     });
 });
-
-
-function addToCfg(color, type, textCode, pointsTo, arrowType){
-    cfg = cfg.concat({'color' : color, 'type' : type, 'textCode' : textCode, 'pointsTo' : pointsTo,
-        'arrowType' : arrowType});
-}
-
-function setCfg(){
-    cfg = [];
-    addToCfg('green', 1, 'a = x + 1;\n' +
-        'b = a + y;\n' +
-        'c = 0;\n', [1, 496351], [2, 0]);
-    addToCfg('green', 0, 'b < z', [2,3], [1, 0]);
-    addToCfg('white', 1, ' c = c + z + 5;', [3,496351], [2, 2]);
-    addToCfg('green', 2, '', [4,496351], [2,2]);
-    addToCfg('green', 1, ' c = 5;', [496351,496351], [2, 2]);
-}
-
-
 
 function declarationType0(counter, i){
     return 'ob' + i + '=>condition: ' + '-' + counter + '-\n' + cfg[i].textCode +

@@ -16,7 +16,6 @@ let tmpEnv = [], cfg = [];
 function runManage(obj){
     cfg = [];
     program([], obj);
-    //cfg = organizeCfg();
 }
 
 function addToCfg(color, type, textCode, pointsTo, arrowType){
@@ -135,6 +134,8 @@ function objMap (env, nextObj, pointer) {
         return handlers[nextObj.type](env, nextObj, pointer);
 }
 
+
+
 function funcDec(env, obj, valArgs, pointer) {
     env = handleArgs(env, obj.params, valArgs);
     let output = objMap(env, obj.body, pointer);
@@ -251,19 +252,19 @@ function setPointersToCircle(ind){
         cfgPointer.pointsTo[0] = cfg.length;
         isEntered = true;
     }
-    else
+    else if(cfgPointer.type === 0)
         makeCircleHelper(cfgPointer.pointsTo[0]);
     if(isEntered)
         return;
     else if(cfgPointer.pointsTo[1] === 496351)
         cfgPointer.pointsTo[1] = cfg.length;
-    else
+    else if(cfgPointer.type === 0)
         makeCircleHelper(cfgPointer.pointsTo[1]);
 }
 
 function makeCircle(x){
     makeCircleHelper(x);
-    addToCfg('green', 2, '', [496351, 496351], [2,2]);
+    addToCfg(cfg[x].color, 2, '', [496351, 496351], [2,2]);
 }
 
 function makeCircleHelper(x){
@@ -369,13 +370,4 @@ function updateExpressionForVal(env, obj, toCalc){
     vl = typeof (vr) === 'number' ? eval(vl) : vl;
     tmpEnv = tmpEnv.concat({'var' : obj.argument.name, 'val' : vl});
     return obj.prefix ? vl : vr;
-}
-
-
-function printEnv(env){
-    let str = '';
-    for(let i = 0; i < env.length; ++i){
-        str+= (env[i].var + ' = ' + env[i].val + '\n');
-    }
-    alert(str);
 }
