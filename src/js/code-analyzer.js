@@ -126,7 +126,7 @@ function program(env, obj) {
     return output[0];
 }
 
-function objMap (env, nextObj, pointer) {
+function objMap (env, nextObj, pointer) { //!!!!!
     let handlers = {'VariableDeclaration' : varDec, 'IfStatement' : ifStatement,
         'ExpressionStatement': expressionStatement, 'SequenceExpression' : sequenceExpression,
         'ReturnStatement' : returnStatement, 'WhileStatement' : whileStatement, 'BlockStatement' : blockStatement};
@@ -209,7 +209,7 @@ function assignmentExpression (env, obj, isSeq, pointer) {
         regExpression(env, obj, objName, isSeq, pointer);
 }
 
-// function updateExpression(env, obj, isSeq, pointer){
+// function updateExpression(env, obj, isSeq, pointer){ //!!!!!
 //     let op = obj.operator, vr = obj.argument.name, strTmpVal = getVal(env, obj.argument, false),
 //         textCode =  obj.argument.prefix ? op + strTmpVal + '' : strTmpVal + op + '',
 //         vl = getVal(env, obj.argument, true);
@@ -218,7 +218,7 @@ function assignmentExpression (env, obj, isSeq, pointer) {
 //     return [updateEnv(extendEnv(env, vr, vl)), pointer];
 // }
 
-function handleExp(env, obj, isSeq, pointer){
+function handleExp(env, obj, isSeq, pointer){ //!!!!!
     return obj.type === 'AssignmentExpression' ? assignmentExpression(env, obj, isSeq, pointer) :
         // obj.type === 'UpdateExpression' ? updateExpression(env, obj, isSeq, pointer) :
         objMap(env, obj, pointer);
