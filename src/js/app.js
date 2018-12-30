@@ -8,10 +8,8 @@ $(document).ready(function () {
         let codeToParse = $('#codePlaceholder').val();
         let parsedCode = parseCode(codeToParse);
         runManage(parsedCode);
-        console.log(JSON.stringify(cfg));
-        let code = generateChartLang();
-        console.log(code);
-        makeFlowDiagram(code);
+        alert(JSON.stringify(cfg));
+        makeFlowDiagram(generateChartLang());
         $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
     });
 });

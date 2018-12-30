@@ -130,11 +130,9 @@ function objMap (env, nextObj, pointer) {
     let handlers = {'VariableDeclaration' : varDec, 'IfStatement' : ifStatement,
         'ExpressionStatement': expressionStatement, 'SequenceExpression' : sequenceExpression,
         'ReturnStatement' : returnStatement, 'WhileStatement' : whileStatement, 'BlockStatement' : blockStatement};
-    if(handlers[nextObj.type] !== undefined)
-        return handlers[nextObj.type](env, nextObj, pointer);
+    // if(handlers[nextObj.type] !== undefined)
+    return handlers[nextObj.type](env, nextObj, pointer);
 }
-
-
 
 function funcDec(env, obj, valArgs, pointer) {
     env = handleArgs(env, obj.params, valArgs);
@@ -159,11 +157,10 @@ function arrayVarDec(env, obj, pointer){
 }
 
 function regVarDec(env, obj, pointer){
-    let textCode = obj.id.name + ' = ' + getVal(env, obj.init, false) + '\n';
+    let textCode = obj.id.name + ((obj.init === null) ? '' : (' = ' + getVal(env, obj.init, false))) + '\n';
     handleCfg(pointer, textCode, 1, [2,2]);
     pointer.pointerOf = cfg.length - 1;
-    let x = getVal(env, obj.init, true);
-    return [updateEnv(extendEnv(env, obj.id.name, obj.init === null ? null : x)), pointer];
+    return [updateEnv(extendEnv(env, obj.id.name, obj.init === null ? null : getVal(env, obj.init, true))), pointer];
 }
 
 function varDec(env, obj, pointer){
@@ -212,19 +209,19 @@ function assignmentExpression (env, obj, isSeq, pointer) {
         regExpression(env, obj, objName, isSeq, pointer);
 }
 
-function updateExpression(env, obj, isSeq, pointer){
-    let op = obj.operator, vr = obj.argument.name, strTmpVal = getVal(env, obj.argument, false),
-        textCode =  obj.argument.prefix ? op + strTmpVal + '' : strTmpVal + op + '',
-        vl = getVal(env, obj.argument, true);
-    handleCfg(pointer, textCode, 1, [2,2]);
-    pointer.pointerOf = length - 1;
-    return [updateEnv(extendEnv(env, vr, vl)), pointer];
-}
+// function updateExpression(env, obj, isSeq, pointer){
+//     let op = obj.operator, vr = obj.argument.name, strTmpVal = getVal(env, obj.argument, false),
+//         textCode =  obj.argument.prefix ? op + strTmpVal + '' : strTmpVal + op + '',
+//         vl = getVal(env, obj.argument, true);
+//     handleCfg(pointer, textCode, 1, [2,2]);
+//     pointer.pointerOf = length - 1;
+//     return [updateEnv(extendEnv(env, vr, vl)), pointer];
+// }
 
 function handleExp(env, obj, isSeq, pointer){
     return obj.type === 'AssignmentExpression' ? assignmentExpression(env, obj, isSeq, pointer) :
-        obj.type === 'UpdateExpression' ? updateExpression(env, obj, isSeq, pointer) :
-            objMap(env, obj, pointer);
+        // obj.type === 'UpdateExpression' ? updateExpression(env, obj, isSeq, pointer) :
+        objMap(env, obj, pointer);
 }
 
 function expressionStatement(env, exp, pointer){
@@ -245,21 +242,27 @@ function blockStatement(env, obj, pointer){
     return output;
 }
 
-function setPointersToCircle(ind){
-    let isEntered = false;
-    let cfgPointer = cfg[ind];
+function setPointersToCircleFirstPoints(cfgPointer, isEntered){
     if(cfgPointer.pointsTo[0] === 496351){
         cfgPointer.pointsTo[0] = cfg.length;
         isEntered = true;
     }
     else if(cfgPointer.type === 0)
         makeCircleHelper(cfgPointer.pointsTo[0]);
-    if(isEntered)
-        return;
-    else if(cfgPointer.pointsTo[1] === 496351)
+    return isEntered;
+}
+
+function setPointersToCircleSecondPoints(cfgPointer, isEntered){
+    if(!isEntered && cfgPointer.pointsTo[1] === 496351)
         cfgPointer.pointsTo[1] = cfg.length;
-    else if(cfgPointer.type === 0)
+    else if(!isEntered && cfgPointer.type === 0)
         makeCircleHelper(cfgPointer.pointsTo[1]);
+}
+
+function setPointersToCircle(ind){
+    let cfgPointer = cfg[ind];
+    let isEntered = setPointersToCircleFirstPoints(cfgPointer, false);
+    setPointersToCircleSecondPoints(cfgPointer, isEntered);
 }
 
 function makeCircle(x){
@@ -272,12 +275,11 @@ function makeCircleHelper(x){
 }
 
 function handlePointers(test, pointer){
-    if(pointer.color === 'green')
-        return [{'pointerOf' : cfg.length, 'color' : test ? 'green' : 'white', 'isInFirstPointTo' : true},
-            {'pointerOf' : cfg.length, 'color' : test ? 'white' : 'green', 'isInFirstPointTo' : false}];
-    else
-        return [{'pointerOf' : cfg.length, 'color' : 'white', 'isInFirstPointTo' : true},
-            {'pointerOf' : cfg.length, 'color' : 'white', 'isInFirstPointTo' : false}];
+    return pointer.color === 'green' ?
+        [{'pointerOf' : cfg.length, 'color' : test ? 'green' : 'white', 'isInFirstPointTo' : true},
+            {'pointerOf' : cfg.length, 'color' : test ? 'white' : 'green', 'isInFirstPointTo' : false}] :
+        [{'pointerOf' : cfg.length, 'color' : 'white', 'isInFirstPointTo' : true}, {'pointerOf' : cfg.length,
+            'color' : 'white', 'isInFirstPointTo' : false}];
 }
 
 function ifStructure(env, obj, pointer) {
